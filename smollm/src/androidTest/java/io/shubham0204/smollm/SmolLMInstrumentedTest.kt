@@ -24,13 +24,13 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SmolLMInstrumentedTest {
     private val modelPath = "/data/local/tmp/smollm2-1.7b-instruct-q4_k_m.gguf"
-    private val systemPrompt = ""
+    // private val systemPrompt = ""
     private val query = "How are you?"
 
     @Test
     suspend fun testSmolLM() {
         val smolLM = SmolLM()
-        smolLM.create(modelPath, systemPrompt)
+        smolLM.create(modelPath)
         val responseFlow = smolLM.getResponse(query)
         responseFlow.collect {
             println(it)

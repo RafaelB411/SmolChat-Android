@@ -16,6 +16,8 @@
 
 package io.shubham0204.smollm
 
+import android.os.SystemClock
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -32,9 +34,9 @@ class SmolLM {
 
     suspend fun create(
         modelPath: String,
-        minP: Float,
-        temperature: Float,
-        storeChats: Boolean,
+        minP: Float = 0.05f,
+        temperature: Float = 1.0f,
+        storeChats: Boolean = false,
     ) = withContext(Dispatchers.IO) {
         nativePtr = loadModel(modelPath, minP, temperature, storeChats)
     }
@@ -57,12 +59,20 @@ class SmolLM {
     fun getResponse(query: String): Flow<String> =
         flow {
             assert(nativePtr != 0L) { "Model is not loaded. Use SmolLM.create to load the model" }
+            var tokens = 0
             startCompletion(nativePtr, query)
+            val startTime = SystemClock.uptimeMillis()
             var piece = completionLoop(nativePtr)
+            val genTime = SystemClock.uptimeMillis() - startTime
+            Log.i("[SmolChat]", "Response generation time (s): " + (genTime/1000).toString())
             while (piece != "[EOG]") {
+                tokens += 1
                 emit(piece)
                 piece = completionLoop(nativePtr)
             }
+            val chatTime = SystemClock.uptimeMillis() - startTime
+            Log.i("[SmolChat]", "Total chat response time (s): " + (chatTime/1000).toString())
+            Log.i("[SmolChat]", "Amount of tokens generated: " +  tokens)
             stopCompletion(nativePtr)
         }
 

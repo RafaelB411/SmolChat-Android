@@ -49,8 +49,10 @@ android {
         compose = true
     }
     packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        resources.excludes.apply {
+            add("/META-INF/{AL2.0,LGPL2.1}")
+            add("LICENSE-EPL-1.0.txt")
+            add("LICENSE-EDL-1.0.txt")
         }
     }
     applicationVariants.configureEach {
@@ -83,6 +85,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.icons.extended)
     implementation(libs.androidx.compose.navigation)
+
+    implementation("com.github.jelmerk:hnswlib-core:1.1.2")
+    implementation("com.github.jelmerk:hnswlib-utils:1.1.2")
+    implementation("com.github.shubham0204:Sentence-Embeddings-Android:0.0.5")
+    implementation("org.apache.commons:commons-csv:1.12.0")
 
     implementation(project(":smollm"))
 
